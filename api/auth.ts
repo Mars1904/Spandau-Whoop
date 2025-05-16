@@ -24,12 +24,13 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }),
   });
 
+  const responseText = await response.text();
+
   if (!response.ok) {
-    const errorDetails = await response.json();
-    console.error('WHOOP API Fehler:', errorDetails);
-    return res.status(response.status).send('Token request failed: ' + JSON.stringify(errorDetails));
+    console.error('WHOOP-API Fehler:', responseText);
+    return res.status(response.status).send('Token request failed: ' + responseText);
   }
 
-  const data = await response.json();
+  const data = JSON.parse(responseText);
   res.status(200).json(data);
 };
