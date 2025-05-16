@@ -7,36 +7,31 @@ const supabase = createClient(
 );
 
 export default async (req: VercelRequest, res: VercelResponse) => {
-  const webhookData = req.body;
+  const { user_id, recovery, sleep, strain, date } = req.body;
 
-  const whoopUserId = webhookData.user_id;
-
-  // WHOOP-Daten in Supabase speichern
   const { data: user } = await supabase
     .from('users')
     .select('id')
-    .eq('whoop_user_id', whoopUserId)
+    .eq('whoop_user_id', user_id)
     .single();
 
   if (!user) {
-    return res.status(400).send('User not found.');
+    return res.status(400).json({ error: 'User not found.' });
   }
 
-  // Daten speichern (Beispiel: daily_metrics Tabelle)
   const { error } = await supabase.from('daily_metrics').insert({
     user_id: user.id,
-    recovery_score: webhookData.recovery?.score,
-    sleep_duration: webhookData.sleep?.duration,
-    strain: webhookData.strain?.score,
-    hrv: webhookData.recovery?.hrv_rmssd,
-    resting_hr: webhookData.recovery?.resting_heart_rate,
-    date: webhookData.date
+    recovery_score: recovery.score,
+    sleep_duration: sleep.duration,
+    strain: strain.score,
+    hrv: recovery.hrv_rmssd,
+    resting_hr: recovery.resting_heart_rate,
+    date: date
   });
 
   if (error) {
-    console.error('Supabase insert error:', error);
-    return res.status(500).send('Database insert error');
+    return res.status(500).json({ error: 'Supabase insert failed', details: error });
   }
 
-  res.status(200).send('Webhook data saved successfully.');
+  res.status(200).json({ success: true });
 };
