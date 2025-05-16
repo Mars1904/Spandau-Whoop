@@ -18,7 +18,7 @@
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        document.getElementById('links').innerHTML = 'Nicht angemeldet.';
+        document.getElementById('links').innerHTML = '<a href="dashboard.html">Zum Login mit WHOOP</a>';
         return;
       }
 
