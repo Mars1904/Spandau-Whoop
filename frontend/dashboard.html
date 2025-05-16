@@ -9,13 +9,26 @@
   <div id="metrics"></div>
 
   <script>
-    const supabase = supabase.createClient(
-      'https://ezppgexbczutakmrpdtg.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8'
-    );
+    const supabaseUrl = 'https://ezppgexbczutakmrpdtg.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8';
+    const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    async function authenticate() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+
+      if (token) {
+        await supabase.auth.signInWithCustomToken(token);
+      }
+    }
 
     async function loadMetrics() {
       const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        document.getElementById('metrics').innerText = 'Nicht angemeldet.';
+        return;
+      }
 
       const { data, error } = await supabase
         .from('daily_metrics')
@@ -24,8 +37,8 @@
         .order('date', { ascending: false })
         .limit(7);
 
-      if (error || !data) {
-        document.getElementById('metrics').innerText = 'Fehler beim Laden der Daten.';
+      if (error || !data.length) {
+        document.getElementById('metrics').innerText = 'Noch keine Daten vorhanden.';
         return;
       }
 
@@ -37,7 +50,10 @@
       `).join('');
     }
 
-    loadMetrics();
+    (async () => {
+      await authenticate();
+      await loadMetrics();
+    })();
   </script>
 </body>
 </html>
