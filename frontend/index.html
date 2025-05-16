@@ -1,36 +1,34 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <title>WHOOP Dashboard Spandau</title>
+  <title>Spandau WHOOP App</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-  <h1>Willkommen bei Spandau WHOOP</h1>
+  <h1>Spandau WHOOP Dashboard</h1>
   <div id="links"></div>
 
   <script>
-    const supabaseUrl = 'https://ezppgexbczutakmrpdtg.supabase.co';
-    const supabaseAnonKey = 'DEIN_SUPABASE_ANON_KEY';
-    const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = supabase.createClient(
+      'https://ezppgexbczutakmrpdtg.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8'
+    );
 
     async function setupLinks() {
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (error || !user) {
-        document.getElementById('links').innerHTML = 'Bitte zuerst einloggen.';
+      if (!user) {
+        document.getElementById('links').innerHTML = 'Nicht angemeldet.';
         return;
       }
 
-      const email = user.email;
-      const isAdmin = email === 'mars1904@me.com';
+      let links = `<a href="dashboard.html">Zur Sportler-Ansicht</a>`;
 
-      let html = `<a href="dashboard.html">Zur Sportler-Ansicht</a>`;
-
-      if (isAdmin) {
-        html += `<br><a href="trainer.html">Zur Trainer-Ansicht (Admin)</a>`;
+      if (user.email === 'mars1904@me.com') {
+        links += `<br><a href="trainer.html">Zur Trainer-Ansicht (Admin)</a>`;
       }
 
-      document.getElementById('links').innerHTML = html;
+      document.getElementById('links').innerHTML = links;
     }
 
     setupLinks();
