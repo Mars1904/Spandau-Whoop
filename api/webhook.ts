@@ -9,14 +9,14 @@ const supabase = createClient(
 export default async (req: VercelRequest, res: VercelResponse) => {
   const { user_id, recovery, sleep, strain, date } = req.body;
 
-  const { data: user } = await supabase
+  const { data: user, error: userErr } = await supabase
     .from('users')
     .select('id')
     .eq('whoop_user_id', user_id)
     .single();
 
-  if (!user) {
-    return res.status(400).json({ error: 'User not found.' });
+  if (userErr || !user) {
+    return res.status(400).json({ error: 'User not found' });
   }
 
   const { error } = await supabase.from('daily_metrics').insert({
@@ -26,11 +26,11 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     strain: strain.score,
     hrv: recovery.hrv_rmssd,
     resting_hr: recovery.resting_heart_rate,
-    date: date
+    date
   });
 
   if (error) {
-    return res.status(500).json({ error: 'Supabase insert failed', details: error });
+    return res.status(500).json({ error: 'Supabase insert error', details: error });
   }
 
   res.status(200).json({ success: true });
