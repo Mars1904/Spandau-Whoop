@@ -1,13 +1,18 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/frontend/(.*)", "dest": "/frontend/$1" },
-    { "src": "/", "dest": "/frontend/index.html" }
-  ],
   "functions": {
     "api/**/*.ts": {
-      "runtime": "nodejs18.x"
+      "runtime": "vercel-node@3"
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/$1.ts"
+    },
+    {
+      "src": "/frontend/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ]
 }
