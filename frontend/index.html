@@ -1,11 +1,39 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <title>WHOOP Dashboard – Spandau 04</title>
+  <title>WHOOP Dashboard Spandau</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-  <h1>Willkommen bei der Spandau WHOOP App!</h1>
-  <a href="/dashboard.html">Spieler-Dashboard</a><br>
-  <a href="/trainer.html">Trainer-Dashboard</a>
+  <h1>Willkommen bei Spandau WHOOP</h1>
+  <div id="links"></div>
+
+  <script>
+    const supabaseUrl = 'https://ezppgexbczutakmrpdtg.supabase.co';
+    const supabaseAnonKey = 'DEIN_SUPABASE_ANON_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    async function setupLinks() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        document.getElementById('links').innerHTML = 'Bitte zuerst einloggen.';
+        return;
+      }
+
+      const email = user.email;
+      const isAdmin = email === 'mars1904@me.com';
+
+      let html = `<a href="dashboard.html">Zur Sportler-Ansicht</a>`;
+
+      if (isAdmin) {
+        html += `<br><a href="trainer.html">Zur Trainer-Ansicht (Admin)</a>`;
+      }
+
+      document.getElementById('links').innerHTML = html;
+    }
+
+    setupLinks();
+  </script>
 </body>
 </html>
