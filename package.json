@@ -1,7 +1,10 @@
 {
   "dependencies": {
     "@vercel/node": "^3.0.12",
-    "node-fetch": "^2.6.12",
-    "@supabase/supabase-js": "^2.43.4"
+    "@supabase/supabase-js": "^2.43.4",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
