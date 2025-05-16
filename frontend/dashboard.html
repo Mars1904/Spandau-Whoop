@@ -1,10 +1,43 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <title>Spieler Dashboard – Spandau 04</title>
+  <title>Sportler Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-  <h1>Spieler Dashboard</h1>
-  <p>Hier siehst du bald deine WHOOP-Daten und Auswertungen.</p>
+  <h1>Mein WHOOP Dashboard</h1>
+  <div id="metrics"></div>
+
+  <script>
+    const supabase = supabase.createClient(
+      'https://ezppgexbczutakmrpdtg.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8'
+    );
+
+    async function loadMetrics() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { data, error } = await supabase
+        .from('daily_metrics')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(7);
+
+      if (error || !data) {
+        document.getElementById('metrics').innerText = 'Fehler beim Laden der Daten.';
+        return;
+      }
+
+      document.getElementById('metrics').innerHTML = data.map(d => `
+        <div>
+          <strong>${d.date}</strong><br>
+          Recovery: ${d.recovery_score}% | Schlaf: ${d.sleep_duration}h | Strain: ${d.strain}
+        </div>
+      `).join('');
+    }
+
+    loadMetrics();
+  </script>
 </body>
 </html>
