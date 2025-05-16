@@ -9,7 +9,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   const { code } = req.query;
 
   if (!code) {
-    return res.status(400).send('Code missing');
+    return res.status(400).json({ error: 'Code missing' });
   }
 
   const response = await fetch('https://api.prod.whoop.com/oauth/oauth2/token', {
@@ -28,7 +28,11 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   if (!response.ok) {
     console.error('WHOOP-API Fehler:', responseText);
-    return res.status(response.status).send('Token request failed: ' + responseText);
+    // hier ist die wichtige Änderung, um Details im Browser zu sehen:
+    return res.status(response.status).json({
+      error: 'Token request failed',
+      details: responseText // Wichtige Fehlerdetails
+    });
   }
 
   const data = JSON.parse(responseText);
