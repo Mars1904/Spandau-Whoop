@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <title>Sportler Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .whoop-button {
       display: inline-block;
@@ -14,68 +14,124 @@
       margin-top: 10px;
       font-weight: bold;
     }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .debug-info {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h1>Mein WHOOP Dashboard</h1>
   <div id="metrics"></div>
   <div id="login-area"></div>
+  <div id="debug" class="debug-info"></div>
 
   <script>
     const supabaseUrl = 'https://ezppgexbczutakmrpdtg.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8';
-    const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    
+    // Korrekte Initialisierung des Supabase-Clients
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
     
     // WHOOP OAuth Konfiguration
     const WHOOP_CLIENT_ID = '4ca23f17-ade9-4c60-89ba-e8bcd3cd15e9'; // Bitte ersetzen Sie dies mit Ihrer Client-ID
     const REDIRECT_URI = 'https://spandau-whoop.vercel.app/api/auth'; // Bitte mit Ihrer echten Redirect-URI ersetzen
 
+    // Debug-Funktion
+    function debugLog(message, data = null) {
+      const debugElement = document.getElementById('debug');
+      if (data) {
+        debugElement.innerHTML += `${message}: ${JSON.stringify(data, null, 2)}\n`;
+      } else {
+        debugElement.innerHTML += `${message}\n`;
+      }
+    }
+
     async function authenticate() {
+      debugLog("Authentifizierung wird gestartet...");
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
 
       if (token) {
-        await supabase.auth.signInWithCustomToken(token);
+        debugLog("Token gefunden:", token);
+        try {
+          const authResult = await supabaseClient.auth.signInWithCustomToken(token);
+          debugLog("Authentifizierungsergebnis:", authResult);
+        } catch (error) {
+          debugLog("Authentifizierungsfehler:", error);
+        }
+      } else {
+        debugLog("Kein Token gefunden");
       }
     }
 
     async function loadMetrics() {
-      const { data: { user } } = await supabase.auth.getUser();
+      debugLog("Lade Metriken...");
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        debugLog("Benutzer:", user);
 
-      if (!user) {
-        document.getElementById('metrics').innerText = 'Bitte melden Sie sich mit WHOOP an, um Ihre Daten zu sehen.';
-        
-        // WHOOP Login-Button anzeigen
-        const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
-        document.getElementById('login-area').innerHTML = `
-          <a href="${loginUrl}" class="whoop-button">Mit WHOOP anmelden</a>
-        `;
-        return;
+        if (!user) {
+          document.getElementById('metrics').innerText = 'Bitte melden Sie sich mit WHOOP an, um Ihre Daten zu sehen.';
+          
+          // WHOOP Login-Button anzeigen
+          const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+          document.getElementById('login-area').innerHTML = `
+            <a href="${loginUrl}" class="whoop-button">Mit WHOOP anmelden</a>
+          `;
+          debugLog("Login-Button angezeigt");
+          return;
+        }
+
+        debugLog("Abfrage der täglichen Metriken für Benutzer-ID:", user.id);
+        const { data, error } = await supabaseClient
+          .from('daily_metrics')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
+          .limit(7);
+
+        debugLog("Abfrageergebnis:", { data, error });
+
+        if (error || !data || !data.length) {
+          document.getElementById('metrics').innerText = 'Noch keine Daten vorhanden.';
+          debugLog("Keine Daten gefunden oder Fehler aufgetreten");
+          return;
+        }
+
+        document.getElementById('metrics').innerHTML = data.map(d => `
+          <div>
+            <strong>${d.date}</strong><br>
+            Recovery: ${d.recovery_score}% | Schlaf: ${d.sleep_duration}h | Strain: ${d.strain}
+          </div>
+        `).join('');
+        debugLog("Daten angezeigt");
+      } catch (error) {
+        debugLog("Fehler beim Laden der Metriken:", error);
+        document.getElementById('metrics').innerText = 'Fehler beim Laden der Daten.';
       }
-
-      const { data, error } = await supabase
-        .from('daily_metrics')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(7);
-
-      if (error || !data.length) {
-        document.getElementById('metrics').innerText = 'Noch keine Daten vorhanden.';
-        return;
-      }
-
-      document.getElementById('metrics').innerHTML = data.map(d => `
-        <div>
-          <strong>${d.date}</strong><br>
-          Recovery: ${d.recovery_score}% | Schlaf: ${d.sleep_duration}h | Strain: ${d.strain}
-        </div>
-      `).join('');
     }
 
     (async () => {
-      await authenticate();
-      await loadMetrics();
+      try {
+        debugLog("Dashboard initialisiert");
+        await authenticate();
+        await loadMetrics();
+      } catch (error) {
+        debugLog("Allgemeiner Fehler:", error);
+      }
     })();
   </script>
 </body>

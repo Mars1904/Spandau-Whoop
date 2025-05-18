@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
   <title>Spandau WHOOP App</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .whoop-button {
       display: inline-block;
@@ -48,5 +49,14 @@
       Mit WHOOP anmelden
     </a>
   </div>
+
+  <script>
+    // Supabase-Client nur initialisieren, wenn der Admin-Zugang geprüft werden soll
+    const supabaseUrl = 'https://ezppgexbczutakmrpdtg.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8';
+    
+    // Korrekte Initialisierung
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+  </script>
 </body>
 </html>
