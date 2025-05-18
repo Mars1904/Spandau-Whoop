@@ -2,18 +2,51 @@
 <html lang="de">
 <head>
   <title>Spandau WHOOP App</title>
-  <meta http-equiv="refresh" content="0;url=/frontend/index.html">
   <style>
+    .whoop-button {
+      display: inline-block;
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .whoop-button:hover {
+      background-color: #333;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
-      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+    }
+    #links {
+      margin: 20px 0;
     }
   </style>
 </head>
 <body>
   <h1>Spandau WHOOP Dashboard</h1>
-  <p>Sie werden weitergeleitet...</p>
-  <p>Falls die Weiterleitung nicht funktioniert, <a href="/frontend/index.html">klicken Sie hier</a>.</p>
+  
+  <div id="links">
+    <a href="/frontend/dashboard.html" class="whoop-button">Zum Sportler-Dashboard</a>
+    <br><br>
+    <a href="/frontend/trainer.html" class="whoop-button">Zur Trainer-Ansicht</a>
+  </div>
+  
+  <div style="margin-top: 40px;">
+    <h3>Direkte Anmeldung mit WHOOP:</h3>
+    <a href="https://api.prod.whoop.com/oauth/oauth2/auth?client_id=4ca23f17-ade9-4c60-89ba-e8bcd3cd15e9&redirect_uri=https://spandau-whoop.vercel.app/api/auth&response_type=code" class="whoop-button">
+      Mit WHOOP anmelden
+    </a>
+  </div>
 </body>
 </html> 
