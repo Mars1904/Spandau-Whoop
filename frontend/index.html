@@ -2,36 +2,38 @@
 <html lang="de">
 <head>
   <title>Spandau WHOOP App</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    .whoop-button {
+      display: inline-block;
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>Spandau WHOOP Dashboard</h1>
-  <div id="links"></div>
-
-  <script>
-    const supabase = supabase.createClient(
-      'https://ezppgexbczutakmrpdtg.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8'
-    );
-
-    async function setupLinks() {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        document.getElementById('links').innerHTML = '<a href="dashboard.html">Zum Login mit WHOOP</a>';
-        return;
-      }
-
-      let links = `<a href="dashboard.html">Zur Sportler-Ansicht</a>`;
-
-      if (user.email === 'mars1904@me.com') {
-        links += `<br><a href="trainer.html">Zur Trainer-Ansicht (Admin)</a>`;
-      }
-
-      document.getElementById('links').innerHTML = links;
-    }
-
-    setupLinks();
-  </script>
+  <div id="links">
+    <a href="/frontend/dashboard.html" class="whoop-button">Zum Sportler-Dashboard</a>
+    <br><br>
+    <a href="/frontend/trainer.html" class="whoop-button">Zur Trainer-Ansicht</a>
+  </div>
+  
+  <div style="margin-top: 40px;">
+    <h3>Direkte Anmeldung mit WHOOP:</h3>
+    <a href="https://api.prod.whoop.com/oauth/oauth2/auth?client_id=4ca23f17-ade9-4c60-89ba-e8bcd3cd15e9&redirect_uri=https://spandau-whoop.vercel.app/api/auth&response_type=code" class="whoop-button">
+      Mit WHOOP anmelden
+    </a>
+  </div>
 </body>
 </html>

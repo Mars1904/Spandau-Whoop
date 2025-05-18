@@ -2,10 +2,14 @@
   "version": 2,
   "functions": {
     "api/**/*.ts": {
-      "runtime": "vercel-node@3"
+      "runtime": "vercel-node@3.0.0"
     }
   },
   "routes": [
+    {
+      "src": "/$",
+      "dest": "/frontend/index.html"
+    },
     {
       "src": "/api/(.*)",
       "dest": "api/$1.ts"
