@@ -3,15 +3,32 @@
 <head>
   <title>Sportler Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    .whoop-button {
+      display: inline-block;
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <h1>Mein WHOOP Dashboard</h1>
   <div id="metrics"></div>
+  <div id="login-area"></div>
 
   <script>
     const supabaseUrl = 'https://ezppgexbczutakmrpdtg.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6cHBnZXhiY3p1dGFrbXJwZHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTUxOTYsImV4cCI6MjA2Mjk3MTE5Nn0.vurkdQ6OdLz_cahv-8ZAzoFDAE8tRU62AcMNEj2Qgy8';
     const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    
+    // WHOOP OAuth Konfiguration
+    const WHOOP_CLIENT_ID = '4ca23f17-ade9-4c60-89ba-e8bcd3cd15e9'; // Bitte ersetzen Sie dies mit Ihrer Client-ID
+    const REDIRECT_URI = 'https://spandau-whoop.vercel.app/api/auth'; // Bitte mit Ihrer echten Redirect-URI ersetzen
 
     async function authenticate() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -26,7 +43,13 @@
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        document.getElementById('metrics').innerText = 'Nicht angemeldet.';
+        document.getElementById('metrics').innerText = 'Bitte melden Sie sich mit WHOOP an, um Ihre Daten zu sehen.';
+        
+        // WHOOP Login-Button anzeigen
+        const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+        document.getElementById('login-area').innerHTML = `
+          <a href="${loginUrl}" class="whoop-button">Mit WHOOP anmelden</a>
+        `;
         return;
       }
 
