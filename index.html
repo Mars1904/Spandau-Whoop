@@ -56,8 +56,16 @@
       }
       return result;
     }
+    const scopes = [
+      'read:recovery',
+      'read:cycles',
+      'read:sleep',
+      'read:workout',
+      'read:profile',
+      'read:body_measurement'
+    ].join(' ');
     document.getElementById('whoop-login').href =
-      `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=ff6cd466-1475-4eef-83f0-092b15dec4ea&redirect_uri=https://spandau-whoop.vercel.app/api/auth&response_type=code&state=${generateState()}`;
+      `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=ff6cd466-1475-4eef-83f0-092b15dec4ea&redirect_uri=https://spandau-whoop.vercel.app/api/auth&response_type=code&scope=${encodeURIComponent(scopes)}&state=${generateState()}`;
   </script>
 </body>
 </html> 

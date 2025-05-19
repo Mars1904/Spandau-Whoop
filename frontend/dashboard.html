@@ -325,8 +325,16 @@
       
       if (!user) {
         document.getElementById('metrics').innerText = 'Bitte melden Sie sich mit WHOOP an, um Ihre Daten zu sehen.';
+        const scopes = [
+          'read:recovery',
+          'read:cycles',
+          'read:sleep',
+          'read:workout',
+          'read:profile',
+          'read:body_measurement'
+        ].join(' ');
         const state = generateState();
-        const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&state=${state}`;
+        const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${state}`;
         document.getElementById('login-area').innerHTML = `
           <a href="${loginUrl}" class="whoop-button">Mit WHOOP anmelden</a>
         `;
