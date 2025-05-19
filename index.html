@@ -44,9 +44,20 @@
   
   <div style="margin-top: 40px;">
     <h3>Direkte Anmeldung mit WHOOP:</h3>
-    <a href="https://api.prod.whoop.com/oauth/oauth2/auth?client_id=ff6cd466-1475-4eef-83f0-092b15dec4ea&redirect_uri=https://spandau-whoop.vercel.app/api/auth&response_type=code" class="whoop-button">
-      Mit WHOOP anmelden
-    </a>
+    <a id="whoop-login" class="whoop-button">Mit WHOOP anmelden</a>
   </div>
+
+  <script>
+    function generateState(length = 16) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+    document.getElementById('whoop-login').href =
+      `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=ff6cd466-1475-4eef-83f0-092b15dec4ea&redirect_uri=https://spandau-whoop.vercel.app/api/auth&response_type=code&state=${generateState()}`;
+  </script>
 </body>
 </html> 

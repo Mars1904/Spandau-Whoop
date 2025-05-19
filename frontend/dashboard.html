@@ -325,7 +325,8 @@
       
       if (!user) {
         document.getElementById('metrics').innerText = 'Bitte melden Sie sich mit WHOOP an, um Ihre Daten zu sehen.';
-        const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+        const state = generateState();
+        const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&state=${state}`;
         document.getElementById('login-area').innerHTML = `
           <a href="${loginUrl}" class="whoop-button">Mit WHOOP anmelden</a>
         `;
@@ -451,6 +452,15 @@
         loadMetrics();
       });
     });
+
+    function generateState(length = 16) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
 
     (async () => {
       try {
