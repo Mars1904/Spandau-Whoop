@@ -24,9 +24,20 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   const state = req.query.state as string;
 
   if (!code) {
-    console.error('Code fehlt in der Anfrage');
-    // Leite zur Login-Seite weiter, wenn kein Code vorhanden ist
-    const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&state=${state || ''}`;
+    // Prüfe, ob state fehlt oder zu kurz ist
+    if (!state || state.length < 8) {
+      return res.status(400).send(`
+        <html>
+          <body style='font-family:sans-serif;max-width:600px;margin:40px auto;'>
+            <h2>Fehler: Der state-Parameter ist zu kurz oder fehlt.</h2>
+            <p>Bitte starte den Login erneut über die Startseite.</p>
+            <p style='color:#888;font-size:0.9em;'>Tipp: Seite neu laden oder Browser-Cache leeren.</p>
+          </body>
+        </html>
+      `);
+    }
+    // Nur wenn state gültig ist, weiterleiten
+    const loginUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${WHOOP_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&state=${state}`;
     return res.redirect(loginUrl);
   }
 
